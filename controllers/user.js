@@ -50,6 +50,11 @@ exports.signinAuthentication = async (request, response, next) => {
 }
 exports.getcurrentuser = async (request, response, next) => {
     const {userId} = request;
-    const user = User.fetchById(userId)
+    const userData = await User.fetchById(userId);
+    const user = {
+        name:userData.name,
+        email:userData.email,
+        ispremiumuser:userData.ispremiumuser
+    }
     response.json({user});
 }

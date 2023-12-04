@@ -63,13 +63,13 @@ function showOutput(response) {
         <td class="text-nowrap">${ele.date}</td>
         <td>
         <a href="#expenseformdiv">
-            <button class="btn btn-outline-success editbtn" id="${ele.id}">
+            <button class="btn btn-outline-success editbtn" id="${ele._id}">
                 Edit
             </button>
         </a>
         </td>
         <td>
-            <button class="btn btn-outline-danger delbtn" id="${ele.id}">
+            <button class="btn btn-outline-danger delbtn" id="${ele._id}">
                 Delete
             </button>
         </td>
@@ -258,7 +258,7 @@ async function editExpense(e) {
     try {
         const eID = e.target.id;
         const response = await authenticatedAxios.get(`expenses/getexpensebyid/${eID}`)
-        const { category, pmethod, amount, date } = response.data[0];
+        const { category, pmethod, amount, date } = response.data;
         elements.Ucategory.value = category;
         elements.Upmethod.value = pmethod;
         elements.Uamount.value = amount;

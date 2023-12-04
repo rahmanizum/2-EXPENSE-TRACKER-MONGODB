@@ -25,13 +25,13 @@ class Expenses{
         .limit(Number(limit))
         .toArray();
     }
-    static fetchById(_id){
+    static fetchById(_id,userId){
         let db =  getDb();
-        return db.collection('Expenses').findOne({ _id: new ObjectId(_id) })
+        return db.collection('Expenses').findOne({ _id: new ObjectId(_id),userId })
     }
-    static deleteById(_id){
+    static deleteById(_id,userId){
         let db = getDb();
-        return db.collection('Expenses').deleteOne({ _id: new ObjectId(_id) })
+        return db.collection('Expenses').deleteOne({ _id: new ObjectId(_id),userId })
     }
 
 }

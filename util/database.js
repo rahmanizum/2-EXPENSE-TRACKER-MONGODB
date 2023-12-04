@@ -13,7 +13,7 @@ const client = new MongoClient(uri, {
     const MongoConnect =  async () => {
       try {
         const Client =await client.connect();
-        _db = Client.db("Expense-tracker");
+        _db = Client.db("Expensetracker");
         console.log("successfully connected to MongoDB!");
       } catch(error){
         console.error(error);

@@ -1,4 +1,4 @@
-const { getDb } = require('../util/database')
+const { getDb } = require('../util/database');
 const { ObjectId } = require('mongodb');
 
 class User {
@@ -15,7 +15,7 @@ class User {
         let db=getDb();
         return db.collection('Users').insertOne(this);
     }
-    fetchByEmail(email){
+    static fetchByEmail(email){
         let db=getDb();
         return db.collection('Users').findOne({email});
     }

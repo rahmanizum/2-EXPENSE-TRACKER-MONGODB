@@ -105,7 +105,7 @@ function createauthaxios() {
         });
     }
     else {
-        window.location.href = "/home";
+        // window.location.href = "/home";
     }
 }
 function logout(e) {
@@ -280,11 +280,11 @@ async function refresh() {
         if (error.response && error.response.status === 401) {
             console.log(error);
             alert(error.response.data.message);
-            window.location.href = "home";
+            // window.location.href = "home";
         } else {
             console.log(error);
             alert("Something went wrong please log in again");
-            window.location.href = "home";
+            // window.location.href = "home";
         }
     }
 }

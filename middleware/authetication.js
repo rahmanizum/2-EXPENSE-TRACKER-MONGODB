@@ -6,8 +6,8 @@ exports.authorization = async(request,response,next)=>{
     try {
         const token = request.headers.authorization;
         const decode = jwt.verify(token,secretKey);
-        const user = await User.findByPk(decode.userId);
-        request.user = user;
+        const {_id} = await User.fetchById(decode.userId); 
+        request.userId = _id.toString();
         next();
         
     } catch (error) {

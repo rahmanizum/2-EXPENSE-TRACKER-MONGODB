@@ -1,5 +1,5 @@
 
-const Userservices = require('../services/userservices');
+const User = require('../models/users');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const secretKey = process.env.SECRET_KEY;
@@ -9,14 +9,16 @@ exports.usergethomePage = (request, response, next) => {
 exports.signupAuthentication = async (request, response, next) => {
     const { Name, userName, password } = request.body;
     try {
-        const user = await Userservices.getUserbyemail(userName);
-        if (!user) {
+        let userExist = await User.fetchByEmail(userName);
+        if (!userExist) {
             const hashedPassword = await bcrypt.hash(password, 10);
-            const user = await Userservices.createUser(Name,userName,hashedPassword);
-            const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn: '1h' });
+            const user = new User(Name,userName,hashedPassword);
+            const { insertedId } = await user.save();
+            const userId = insertedId.toString();
+            const token = jwt.sign({ userId: userId }, secretKey, { expiresIn: '1h' });
             response.status(200).send({ token: token, user: user });
         } else {
-            response.status(401).send(user);
+            response.status(401).send(userExist);
         }
 
     } catch (error) {
@@ -26,14 +28,15 @@ exports.signupAuthentication = async (request, response, next) => {
 exports.signinAuthentication = async (request, response, next) => {
     try {
         const { userName, password } = request.body;
-        const user = await Userservices.getUserbyemail(userName);
-        if (!user) {
+        let userExist = await User.fetchByEmail(userName);
+        if (!userExist) {
             response.status(404).send('User not found');
         } else {
-            const isPasswordValid = await bcrypt.compare(password, user.password);
+            const isPasswordValid = await bcrypt.compare(password, userExist.password);
             if (isPasswordValid) {
-                const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn: '1h' });
-                response.status(200).json({ token: token, user: user });
+                const userId = userExist._id.toString();
+                const token = jwt.sign({ userId: userId }, secretKey, { expiresIn: '1h' });
+                response.status(200).json({ token: token, user: userExist });
             } else {
                 response.status(401).send('Authentication failed');
             }
@@ -46,6 +49,7 @@ exports.signinAuthentication = async (request, response, next) => {
     }
 }
 exports.getcurrentuser = async (request, response, next) => {
-    const user = request.user;
+    const {userId} = request;
+    const user = User.fetchById(userId)
     response.json({user});
 }

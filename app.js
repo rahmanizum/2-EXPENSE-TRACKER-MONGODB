@@ -12,7 +12,7 @@ const mainPageRouter = require('./routes/mainpage');
 const userRouter = require('./routes/user');
 const expenseRouter = require('./routes/expenses');
 const purchaseRouter = require('./routes/purchase');
-// const premiumRouter = require('./routes/premium');
+const premiumRouter = require('./routes/premium');
 // const passwordRouter = require('./routes/password');
 
 const app = express();
@@ -25,7 +25,7 @@ app.use(mainPageRouter)
 app.use('/user',userRouter);
 app.use('/purchase',purchaseRouter);
 app.use('/expenses',expenseRouter);
-// app.use('/premium',premiumRouter);
+app.use('/premium',premiumRouter);
 // app.use('/password',passwordRouter);
 
 async function initiate(){

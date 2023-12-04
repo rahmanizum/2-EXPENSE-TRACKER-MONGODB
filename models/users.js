@@ -52,7 +52,7 @@ class User {
     }
     static saveDownloadHistory(_id,url){
         const db=getDb();
-        return db.collection('Users').updateOne({_id},{$push:{downloadUrl:url}});
+        return db.collection('Users').updateOne({_id : new ObjectId(_id)},{$push:{"downloadUrl":url}});
     }
 
 }

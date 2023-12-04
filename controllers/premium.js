@@ -1,13 +1,15 @@
 
 const User = require('../models/users');
+const Expenses = require('../models/expenses');
 const Awsservice = require('../services/awsservices'); 
 exports.getLeaderboardExpenses = async (request, response, next) => {
   try {
-    const leaderboard = await User.findAll({
-      attributes: ['id', 'name', 'totalExpenses'],
-      order: [['totalExpenses', 'DESC']],
-      limit:15
-    });
+    // const leaderboard = await User.findAll({
+    //   attributes: ['id', 'name', 'totalExpenses'],
+    //   order: [['totalExpenses', 'DESC']],
+    //   limit:15
+    // });
+    leaderboard=[];
     return response.status(200).json(leaderboard);
   } catch (error) {
     console.error(error);
@@ -18,10 +20,9 @@ exports.getLeaderboardExpenses = async (request, response, next) => {
 
 exports.getDownloadURL = async (request, response, next) => {
   try {
-    const user = request.user;
-    const expenses = await user.getExpenses({
-      attributes: ["category", "pmethod", "amount", "date"],
-    });
+    const {userId} = request;
+    const user = await User.fetchById(userId);
+    const expenses = await Expenses.fetchAll(0,0,userId)
     const formattedExpenses = expenses.map(expense => {
       return `Category: ${expense.category}
 Payment Method: ${expense.pmethod}
@@ -30,10 +31,11 @@ Date: ${expense.date}
 `;
     });
     const textData = formattedExpenses.join("\n");
-    const filename = `expense-data/user${user.id}/${user.name}${new Date()}.txt`;
+    const filename = `expense-data/user${userId}/${user.name}${new Date()}.txt`;
     const URL = await Awsservice.uploadToS3(textData, filename);
-    await user.createDownload({
-      downloadUrl: URL
+    await User.saveDownloadHistory(userId,{
+      downloadUrl:URL,
+      createdAt:new Date()
     })
     response.status(200).json({URL,success:true});
   } catch (error) {
@@ -43,9 +45,9 @@ Date: ${expense.date}
 };
 exports.getDownloadhistory = async(request,response,next) =>{
   try {
-    const user = request.user;
-    const history = await user.getDownloads();
-    response.status(200).json(history);
+  const {userId} = request;
+    const {downloadUrl}= await User.fetchById(userId);
+    response.status(200).json({history:downloadUrl});
     
   } catch (error) {
     console.log(error);

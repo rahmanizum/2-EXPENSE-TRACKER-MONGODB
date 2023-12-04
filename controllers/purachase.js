@@ -1,5 +1,5 @@
 
-const Order = require('../models/orders');
+const User= require('../models/users');
 const Razorpay = require('razorpay');
 const key_id = process.env.RAZORPAY_KEY_ID;
 const key_secret = process.env.RAZORPAY_KEY_SECRET;
@@ -14,12 +14,13 @@ exports.premiummembership = async (request, response, next) => {
             currency: "INR",
         };
         const orderDetails = await rzpintance.orders.create(options);
-        const user = request.user;
+        const {userId }= request;
         const { id, status } = orderDetails;
-        await user.createOrder({
-            orderid: id,
+        const user = await  User.fetchById(userId)
+        await User.createOrder(userId,{
+            order_id: id,
             status: status,
-        })
+        });
         response.status(200).json({ key_id: key_id, orderid: id, user: user });
 
     } catch (error) {
@@ -30,15 +31,14 @@ exports.updatetransactionstatus = async (request, response, next) => {
     const { order_id, payment_id } = request.body;
 
     try {
-        const user = request.user;
+        const {userId }= request;
+        const user = await  User.fetchById(userId);
+        const {order} = user;
         user.ispremiumuser = true;
-        await Promise.all([
-            user.save(),
-            Order.update(
-                { paymentid: payment_id, status: "Successful" },
-                { where: { orderid: order_id }}
-            )
-        ])
+        order.payment_id = payment_id;
+        order.status = "Successfull";
+        order.createdAt = new Date();
+        await User.updateOrder(userId,order)
         response.status(202).json({ success: true, message: "Thank youfor being a premium user" });
     } catch (error) {
         console.log(error);

@@ -10,6 +10,7 @@ class User {
         this.ispremiumuser=false;
         this.downloadUrl = [];
         this.forgotPassword = {};
+        this.order = {};
     }
     save(){
         let db=getDb();
@@ -39,9 +40,20 @@ class User {
         const db = getDb();
         return db.collection('Users').findOne({ "forgotPassword.forgotId": forgotId });
     }
+    static createOrder(userId,order){
+        const db = getDb();
+        return db.collection("Users")
+        .updateOne({_id : new ObjectId(userId)},{$set:{"order":order }});   
+    }
+    static updateOrder(UsersId,order){
+        const db = getDb();
+        return db.collection("Users")
+        .updateOne({_id : new ObjectId(UsersId)},{$set:{ "order":order ,"ispremiumuser":true}});   
+    }
     static saveDownloadHistory(_id,url){
         const db=getDb();
         return db.collection('Users').updateOne({_id},{$push:{downloadUrl:url}});
     }
+
 }
 module.exports=User;
